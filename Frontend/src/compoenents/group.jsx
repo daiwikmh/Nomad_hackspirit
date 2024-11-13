@@ -1,57 +1,61 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PlusCircle, Users, Wallet, Calendar } from 'lucide-react';
+import { useUser } from '@clerk/clerk-react';  // Clerk hook for user info
+import axios from 'axios';  // Make sure axios is imported for the API request
 
 const TravelExpensePool = () => {
   const [groups, setGroups] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const { isSignedIn, user, isLoaded } = useUser();  // Use Clerk's useUser hook
+  console.log(JSON.stringify(user));
   const [newGroup, setNewGroup] = useState({
     name: '',
     description: '',
     date: '',
-    targetAmount: ''
-  });
-  const [selectedGroup, setSelectedGroup] = useState(null);
-  const [showExpenseForm, setShowExpenseForm] = useState(false);
-  const [newExpense, setNewExpense] = useState({
-    description: '',
-    amount: ''
+    targetAmount: '',
+    members: []
   });
 
-  const handleCreateGroup = (e) => {
+  const [newMemberEmail, setNewMemberEmail] = useState("");
+  useEffect(() => {
+    if (isLoaded && user) {
+      setNewGroup(prevGroup => ({
+        ...prevGroup,
+        members: [user.primaryEmailAddress.emailAddress]
+      }));
+    }
+  }, [isLoaded, user]);
+
+  // Handle form submission to create a group
+  const handleCreateGroup = async (e) => {
     e.preventDefault();
-    const group = {
-      ...newGroup,
-      id: Date.now(),
-      members: [],
-      pooledAmount: 0,
-      expenses: [],
-      pendingApprovals: []
-    };
-    setGroups([...groups, group]);
-    setNewGroup({ name: '', description: '', date: '', targetAmount: '' });
-    setShowCreateForm(false);
+
+    try {
+      console.log(newGroup);
+      const response = await axios.post('http://localhost:3001/api/create-group', {
+        name: newGroup.name,
+        description: newGroup.description,
+        members: newGroup.members
+      });
+
+      // Add the created group to the list
+      setGroups([...groups, response.data]);
+
+      // Reset the form after successful submission
+      setNewGroup({ name: '', description: '', date: '', targetAmount: '', members: [] });
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error('Error creating group:', error);
+    }
   };
 
-  const handleAddExpense = (groupId) => {
-    if (!newExpense.description || !newExpense.amount) return;
-    
-    const updatedGroups = groups.map(group => {
-      if (group.id === groupId) {
-        return {
-          ...group,
-          pendingApprovals: [...group.pendingApprovals, {
-            ...newExpense,
-            id: Date.now(),
-            approvals: []
-          }]
-        };
-      }
-      return group;
-    });
-    
-    setGroups(updatedGroups);
-    setNewExpense({ description: '', amount: '' });
-    setShowExpenseForm(false);
+  const handleAddMember = () => {
+    if (!newMemberEmail) return;
+    setNewGroup(prevGroup => ({
+      ...prevGroup,
+      members: [...prevGroup.members, newMemberEmail]
+    }));
+    setNewMemberEmail("");
   };
 
   return (
@@ -79,7 +83,7 @@ const TravelExpensePool = () => {
                     type="text"
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     value={newGroup.name}
-                    onChange={(e) => setNewGroup({...newGroup, name: e.target.value})}
+                    onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
                     required
                   />
                 </div>
@@ -88,32 +92,41 @@ const TravelExpensePool = () => {
                   <textarea
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     value={newGroup.description}
-                    onChange={(e) => setNewGroup({...newGroup, description: e.target.value})}
+                    onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block mb-1 font-medium">Travel Date</label>
+
+                <div className="pt-4">
+                  <label className="block mb-1 font-medium">Add Members by Email</label>
+                  <div className="flex gap-2">
                     <input
-                      type="date"
+                      type="email"
                       className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                      value={newGroup.date}
-                      onChange={(e) => setNewGroup({...newGroup, date: e.target.value})}
-                      required
+                      placeholder="Enter member's email"
+                      value={newMemberEmail}
+                      onChange={(e) => setNewMemberEmail(e.target.value)}
                     />
+                    <button
+                      type="button"
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      onClick={handleAddMember}
+                    >
+                      Add
+                    </button>
                   </div>
-                  <div>
-                    <label className="block mb-1 font-medium">Target Amount</label>
-                    <input
-                      type="number"
-                      className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                      value={newGroup.targetAmount}
-                      onChange={(e) => setNewGroup({...newGroup, targetAmount: e.target.value})}
-                      required
-                    />
+                  <div className="mt-2">
+                    {newGroup.members.map((email, index) => (
+                      <span
+                        key={index}
+                        className="inline-block px-2 py-1 bg-gray-200 text-gray-800 rounded-lg text-sm mr-2 mb-2"
+                      >
+                        {email}
+                      </span>
+                    ))}
                   </div>
                 </div>
+
                 <div className="flex justify-end gap-2 pt-4">
                   <button
                     type="button"
@@ -127,104 +140,6 @@ const TravelExpensePool = () => {
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Create Group
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {groups.map(group => (
-          <div key={group.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-            <div className="mb-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold">{group.name}</h3>
-                <span className="text-sm text-gray-500">
-                  {new Date(group.date).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-gray-600">
-                <Users className="w-5 h-5" />
-                <span>{group.members.length} members</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Wallet className="w-5 h-5" />
-                <span>Pooled: ${group.pooledAmount} / ${group.targetAmount}</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Calendar className="w-5 h-5" />
-                <span>{group.date}</span>
-              </div>
-              
-              {group.pendingApprovals.length > 0 && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-                  <p className="text-yellow-700">
-                    {group.pendingApprovals.length} expense{group.pendingApprovals.length !== 1 ? 's' : ''} pending approval
-                  </p>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2">
-                <button
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  onClick={() => {
-                    setSelectedGroup(group);
-                    setShowExpenseForm(true);
-                  }}
-                >
-                  Add Expense
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {showExpenseForm && selectedGroup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="p-6">
-              <h2 className="text-xl font-bold mb-4">Add New Expense</h2>
-              <form className="space-y-4">
-                <div>
-                  <label className="block mb-1 font-medium">Description</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    value={newExpense.description}
-                    onChange={(e) => setNewExpense({...newExpense, description: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">Amount</label>
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    value={newExpense.amount}
-                    onChange={(e) => setNewExpense({...newExpense, amount: e.target.value})}
-                  />
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
-                  <button
-                    type="button"
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
-                    onClick={() => {
-                      setShowExpenseForm(false);
-                      setNewExpense({ description: '', amount: '' });
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    onClick={() => handleAddExpense(selectedGroup.id)}
-                  >
-                    Submit for Approval
                   </button>
                 </div>
               </form>
