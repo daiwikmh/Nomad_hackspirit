@@ -124,7 +124,6 @@ const GroupDetails = () => {
                 backgroundSize: '6rem 4rem'
             }}
         > <div style={{
-            
         }}>
                 <h2 className="text-2xl font-bold mb-4 text-center">{group.name}</h2>
                 <p className="text-gray-600 mb-6 text-center">{group.description}</p>
