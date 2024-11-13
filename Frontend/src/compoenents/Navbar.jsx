@@ -8,7 +8,7 @@ import {
   SignInButton,
   UserButton,
 } from "@clerk/clerk-react";
-
+import Logo from "../assets/logo.jpg";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -24,7 +24,7 @@ export default function Navbar() {
             <div>
               <a href="#" className="flex items-center py-4 px-2">
                 <span className="font-semibold text-gray-500 text-lg">
-                  Logo
+                  <img className="h-12" src={Logo} alt="Logo" />
                 </span>
               </a>
             </div>
@@ -58,16 +58,23 @@ export default function Navbar() {
                 className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300"
               >
                 <SignedOut>
-                <SignInButton />
+                  <SignInButton />
                 </SignedOut>
                 <SignedIn>
-                <UserButton />
-              </SignedIn>
+                  <UserButton />
+                </SignedIn>
               </a>
-              
             </div>
           </div>
           <div className="md:hidden flex items-center">
+            <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-200">
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </a>
             <button
               className="outline-none mobile-menu-button"
               onClick={toggleMenu}
@@ -90,14 +97,6 @@ export default function Navbar() {
           </a>
           <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-200">
             Contact Us
-          </a>
-          <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-200">
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
           </a>
         </div>
       )}
