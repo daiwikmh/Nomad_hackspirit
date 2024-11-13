@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './index.css'
+import TravelExpensePool from '../src/compoenents/ui/group'
 
 
 function App() {
@@ -7,7 +8,7 @@ function App() {
 
   return (
     <>
-      <h1 className='text-3xl font-bold underline'>Hello</h1>
+      <TravelExpensePool />
     </>
   )
 }
