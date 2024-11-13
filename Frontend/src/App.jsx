@@ -1,14 +1,13 @@
-import { useState } from 'react'
+import React from 'react'
 import './index.css'
 import TravelExpensePool from '../src/compoenents/ui/group'
 
+import Navbar from './compoenents/Navbar/Navbar'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <TravelExpensePool />
+      <Navbar />
     </>
   )
 }
