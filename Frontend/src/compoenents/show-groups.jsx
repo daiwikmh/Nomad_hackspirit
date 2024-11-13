@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useUser } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 
 const ShowGroups = () => {
     const [groups, setGroups] = useState([]);
-    const { isSignedIn, user, isLoaded } = useUser(); 
+    const { isSignedIn, user, isLoaded } = useUser();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -23,6 +25,10 @@ const ShowGroups = () => {
         fetchGroups();
     }, [isLoaded, user]);
 
+    const handleGroupClick = (groupId) => {
+        navigate(`/groups/${groupId}`);
+    };
+
     return (
         <div className="p-4 max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold mb-4">Your Groups</h1>
@@ -30,9 +36,12 @@ const ShowGroups = () => {
             {groups.length === 0 ? (
                 <p className="text-gray-600">You are not a member of any groups.</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4" >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {groups.map(group => (
-                        <div key={group._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                        <div key={group._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
+                            onClick={() => handleGroupClick(group._id)}
+
+                        >
                             <div className="mb-4">
                                 <h3 className="text-lg font-bold">{group.name}</h3>
                             </div>

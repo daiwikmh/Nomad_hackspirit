@@ -6,6 +6,9 @@ import ShowGroups from './compoenents/show-groups';
 import ErrorBoundary from "./ErrorBoundary";
 
 import TravelExpensePool from "../src/compoenents/group";
+import axios from 'axios';
+import { useUser } from '@clerk/clerk-react';
+import GroupDetails from './compoenents/groupId';
 function App() {
   const { user } = useUser();
   useEffect(() => {
@@ -26,7 +29,7 @@ function App() {
   }, [user]);
 
   return (
-    <>
+    <ErrorBoundary>
       <Router>
         <Routes>
           <Route path="/" element={<CanvasAnimation />} />
@@ -36,12 +39,20 @@ function App() {
               <>
                 <Navbar />
                 <TravelExpensePool />
+                <ShowGroups />
               </>
             }
           />
+          <Route path="/groups/:groupId" element={
+            <>
+              <Navbar />
+              <GroupDetails />
+            </>
+          }
+          />
         </Routes>
       </Router>
-    </>
+    </ErrorBoundary>
   );
 }
 
