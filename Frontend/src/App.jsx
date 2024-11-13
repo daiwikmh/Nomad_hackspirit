@@ -1,15 +1,11 @@
 import React, { useEffect } from 'react'
-import './index.css'
-import TravelExpensePool from '../src/compoenents/group';
-import axios from "axios";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import CanvasAnimation from "./compoenents/canvasWelcomePage";
+import Navbar from "./compoenents/Navbar";
+import ShowGroups from './compoenents/show-groups';
 import ErrorBoundary from "./ErrorBoundary";
 
-import { useUser } from "@clerk/clerk-react";
-
-
-import Navbar from './compoenents/Navbar/Navbar'
-import ShowGroups from './compoenents/show-groups';
-
+import TravelExpensePool from "../src/compoenents/group";
 function App() {
   const { user } = useUser();
   useEffect(() => {
@@ -30,12 +26,23 @@ function App() {
   }, [user]);
 
   return (
-    <ErrorBoundary>
-      <Navbar />
-      <TravelExpensePool />
-      <ShowGroups />
-    </ErrorBoundary>
-  )
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<CanvasAnimation />} />
+          <Route
+            path="/home"
+            element={
+              <>
+                <Navbar />
+                <TravelExpensePool />
+              </>
+            }
+          />
+        </Routes>
+      </Router>
+    </>
+  );
 }
 
-export default App
+export default App;
