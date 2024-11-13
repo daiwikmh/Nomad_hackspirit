@@ -61,7 +61,6 @@ const TravelExpensePool = () => {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Travel Expense Pool</h1>
         <button
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           onClick={() => setShowCreateForm(true)}

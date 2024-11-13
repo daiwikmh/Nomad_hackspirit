@@ -9,7 +9,7 @@ const GroupDetails = () => {
     const [amount, setAmount] = useState(0);
     const [paymentAmount, setPaymentAmount] = useState(0);
     const [transaction, setTransaction] = useState(null);
-    const [approvedTransactions, setApprovedTransactions] = useState([]); // Store list of approved transactions
+    const [approvedTransactions, setApprovedTransactions] = useState([]);
     const [error, setError] = useState("");
     const { isSignedIn, user, isLoaded } = useUser();
 
@@ -27,7 +27,7 @@ const GroupDetails = () => {
             try {
                 const response = await axios.get(`http://localhost:3001/api/pending-transactions/${groupId}`);
                 if (response.data.length > 0) {
-                    setTransaction(response.data[0]); // Assume only one pending transaction per group
+                    setTransaction(response.data[0]);
                 }
             } catch (error) {
                 console.error('Error fetching pending transaction:', error);
@@ -89,12 +89,11 @@ const GroupDetails = () => {
                 });
                 setTransaction(response.data);
                 if (response.data.status === "approved") {
-                    // Transaction approved, refresh group data and approved transactions
                     const updatedGroup = await axios.get(`http://localhost:3001/api/groups/${groupId}`);
                     const updatedApprovedTransactions = await axios.get(`http://localhost:3001/api/approved-transactions/${groupId}`);
                     setGroup(updatedGroup.data);
                     setApprovedTransactions(updatedApprovedTransactions.data);
-                    setTransaction(null); // Clear transaction after full approval
+                    setTransaction(null);
                 }
                 setError("");
             }
@@ -118,99 +117,112 @@ const GroupDetails = () => {
     if (!group) return <div>Loading...</div>;
 
     return (
-        <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md my-[100px]">
-            <h2 className="text-2xl font-bold mb-4">{group.name}</h2>
-            <p className="text-gray-600 mb-4">{group.description}</p>
-            <div className="mb-4">
-                <h4 className="text-lg font-semibold">Members:</h4>
-                <ul className="mt-2">
-                    {group.members.map(member => (
-                        <li key={member._id} className="text-gray-700">
-                            {member.email} - Pooled Amount: ${member.pooledAmount}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="mt-4">
-                <span className="text-lg font-bold">Total Pooled Amount: ${group.totalPool}</span>
-            </div>
+        <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg my-[100px]"
+            style={{
+                backgroundColor: 'white',
+                backgroundImage: 'radial-gradient(circle 500px at 50% 200px, #C9EBFF, transparent)',
+                backgroundSize: '6rem 4rem'
+            }}
+        > <div style={{
+            
+        }}>
+                <h2 className="text-2xl font-bold mb-4 text-center">{group.name}</h2>
+                <p className="text-gray-600 mb-6 text-center">{group.description}</p>
 
-            {/* Add Money to Pool Section */}
-            <div className="mt-6">
-                <h3 className="text-lg font-bold mb-2">Add Money to Pool</h3>
-                <input
-                    type="number"
-                    className="p-2 border rounded-lg w-full mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    placeholder="Enter amount to add"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                />
-                {error && <div className="text-red-500 mb-2">{error}</div>}
-                <button
-                    onClick={handleAddToPool}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                    Add to Pool
-                </button>
-            </div>
-
-            {/* Request Payment Section */}
-            <div className="mt-6">
-                <h3 className="text-lg font-bold mb-2">Request Payment</h3>
-                <input
-                    type="number"
-                    className="p-2 border rounded-lg w-full mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    placeholder="Enter amount to request"
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                />
-                <button
-                    onClick={handleRequestPayment}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                    Request Payment
-                </button>
-            </div>
-
-            {/* Approve or Deny Payment Section */}
-            {transaction && transaction.status === "pending" && (
-                <div className="mt-6">
-                    <h3 className="text-lg font-bold mb-2">Pending Payment Approval</h3>
-                    <p className="text-gray-700">Amount Requested: ${transaction.amount}</p>
-                    <h4 className="text-lg font-semibold mt-2">Approval Status:</h4>
+                {/* Group Details */}
+                <div className="bg-gray-50 p-4 rounded-lg shadow mb-6">
+                    <h4 className="text-lg font-semibold">Members:</h4>
                     <ul className="mt-2">
-                        {transaction.approvals.map(approval => (
-                            <li key={approval.email} className="text-gray-700">
-                                {approval.email} - {approval.status === "approved" ? "Approved" : "Pending"}
+                        {group.members.map(member => (
+                            <li key={member._id} className="text-gray-700">
+                                {member.email} - Pooled Amount: ${member.pooledAmount}
                             </li>
                         ))}
                     </ul>
+                    <div className="mt-4">
+                        <span className="text-lg font-bold">Total Pooled Amount: ${group.totalPool}</span>
+                    </div>
+                </div>
+
+                {/* Add Money to Pool Section */}
+                <div className="bg-gray-50 p-4 rounded-lg shadow mb-6">
+                    <h3 className="text-lg font-bold mb-2">Add Money to Pool</h3>
+                    <input
+                        type="number"
+                        className="p-2 border rounded-lg w-full mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="Enter amount to add"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                    />
                     {error && <div className="text-red-500 mb-2">{error}</div>}
                     <button
-                        onClick={handleApprovePayment}
-                        className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors mr-2"
+                        onClick={handleAddToPool}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full"
                     >
-                        Approve Payment
-                    </button>
-                    <button
-                        onClick={handleDenyPayment}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                        Deny Payment
+                        Add to Pool
                     </button>
                 </div>
-            )}
 
-            {/* Approved Transactions Section */}
-            <div className="mt-8">
-                <h3 className="text-lg font-bold mb-2">Approved Transactions</h3>
-                <ul className="mt-2">
-                    {approvedTransactions.map(transaction => (
-                        <li key={transaction._id} className="text-gray-700">
-                            Amount: ${transaction.amount} - Approved By: {transaction.approvals.length} members
-                        </li>
-                    ))}
-                </ul>
+                {/* Request Payment Section */}
+                <div className="bg-gray-50 p-4 rounded-lg shadow mb-6">
+                    <h3 className="text-lg font-bold mb-2">Request Payment</h3>
+                    <input
+                        type="number"
+                        className="p-2 border rounded-lg w-full mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="Enter amount to request"
+                        value={paymentAmount}
+                        onChange={(e) => setPaymentAmount(e.target.value)}
+                    />
+                    <button
+                        onClick={handleRequestPayment}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors w-full"
+                    >
+                        Request Payment
+                    </button>
+                </div>
+
+                {/* Approve or Deny Payment Section */}
+                {transaction && transaction.status === "pending" && (
+                    <div className="bg-gray-50 p-4 rounded-lg shadow mb-6">
+                        <h3 className="text-lg font-bold mb-2">Pending Payment Approval</h3>
+                        <p className="text-gray-700">Amount Requested: ${transaction.amount}</p>
+                        <h4 className="text-lg font-semibold mt-2">Approval Status:</h4>
+                        <ul className="mt-2">
+                            {transaction.approvals.map(approval => (
+                                <li key={approval.email} className="text-gray-700">
+                                    {approval.email} - {approval.status === "approved" ? "Approved" : "Pending"}
+                                </li>
+                            ))}
+                        </ul>
+                        {error && <div className="text-red-500 mb-2">{error}</div>}
+                        <div className="flex space-x-4">
+                            <button
+                                onClick={handleApprovePayment}
+                                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors w-full"
+                            >
+                                Approve Payment
+                            </button>
+                            <button
+                                onClick={handleDenyPayment}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors w-full"
+                            >
+                                Deny Payment
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Approved Transactions Section */}
+                <div className="bg-gray-50 p-4 rounded-lg shadow">
+                    <h3 className="text-lg font-bold mb-2">Approved Transactions</h3>
+                    <ul className="mt-2">
+                        {approvedTransactions.map(transaction => (
+                            <li key={transaction._id} className="text-gray-700">
+                                Amount: ${transaction.amount} - Approved By: {transaction.approvals.length} members
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

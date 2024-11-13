@@ -9,6 +9,7 @@ import TravelExpensePool from "../src/compoenents/group";
 import axios from 'axios';
 import { useUser } from '@clerk/clerk-react';
 import GroupDetails from './compoenents/groupId';
+import HeroSection from './compoenents/HeroSection';
 function App() {
   const { user } = useUser();
   useEffect(() => {
@@ -38,8 +39,7 @@ function App() {
             element={
               <>
                 <Navbar />
-                <TravelExpensePool />
-                <ShowGroups />
+                <HeroSection />
               </>
             }
           />

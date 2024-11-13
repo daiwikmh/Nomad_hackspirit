@@ -30,13 +30,13 @@ const ShowGroups = () => {
     };
 
     return (
-        <div className="p-4 max-w-4xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Your Groups</h1>
+        <div className="">
+            <h1 className="text-2xl font-bold mb-4 text-white text-center">Your Groups</h1>
 
             {groups.length === 0 ? (
                 <p className="text-gray-600">You are not a member of any groups.</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-wrap gap-4">
                     {groups.map(group => (
                         <div key={group._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
                             onClick={() => handleGroupClick(group._id)}

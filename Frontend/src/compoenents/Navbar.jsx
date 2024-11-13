@@ -9,20 +9,23 @@ import {
   UserButton,
 } from "@clerk/clerk-react";
 import Logo from "../assets/logo.jpg";
+import { useNavigate } from "react-router-dom";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className=" shadow-lg bg-black"
+    >
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between">
-          <div className="flex space-x-7">
+          <div className="flex space-x-7 justify-between w-full">
             <div>
-              <a href="#" className="flex items-center py-4 px-2">
+              <a href="/home" className="flex items-center py-4 px-2">
                 <span className="font-semibold text-gray-500 text-lg">
                   <img className="h-12" src={Logo} alt="Logo" />
                 </span>
@@ -30,28 +33,10 @@ export default function Navbar() {
             </div>
             <div className="hidden md:flex items-center space-x-1">
               <a
-                href="#"
+                href="/home"
                 className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300"
               >
                 Home
-              </a>
-              <a
-                href="#"
-                className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300"
-              >
-                Services
-              </a>
-              <a
-                href="#"
-                className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300"
-              >
-                About
-              </a>
-              <a
-                href="#"
-                className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300"
-              >
-                Contact Us
               </a>
               <a
                 href="#"
@@ -86,17 +71,8 @@ export default function Navbar() {
       </div>
       {isOpen && (
         <div className="md:hidden">
-          <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-200">
+          <a href="/home" className="block py-2 px-4 text-sm hover:bg-gray-200">
             Home
-          </a>
-          <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-200">
-            Services
-          </a>
-          <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-200">
-            About
-          </a>
-          <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-200">
-            Contact Us
           </a>
         </div>
       )}
